@@ -15,15 +15,15 @@ beep off
 % [decision,DATA] = myFun(boardLower,CurPnum,DATA)
 %
 myFun = 'myPlay';
-
+cache_file="cache/tetrisBuildCache.mat";
 N = 50; % max number of pieces per episode
-nEpisodes = 5; % number of episodes
+nEpisodes = 1; % number of episodes
 
-buildStates = 0; % flag to build state space
+buildStates = 1; % flag to build state space
 morePieces = 0; % add the s-shaped pieces
 
-GameSize = [8,6]; % height x width
-RowCap = 4; % height of gameOver
+GameSize = [8,4]; % height x width
+RowCap = 3; % height of gameOver
 
 TimeDelay=.05; % Time delay of dropping piece (lower number=faster)
 
@@ -42,16 +42,26 @@ DATA.example2 = [];
 % Initialize and Setup Game
 
 DATA.rowCap = RowCap;
+numRots = [3 3 1]; %number of times each piece can be rotated, the total set of configurations is the rotations plus the original one
 % Define the game pieces
 Pieces{1} = [0 1;1 1];
 Pieces{2} = [0 1 0;1 1 1];
 Pieces{3} = [1 1 1];
-numRots = [3 3 1]; %number of times each piece can be rotated, the total set of configurations is the rotations plus the original one
 if morePieces == 1,
     Pieces{4} = [1 1 0;0 1 1];
     Pieces{5} = [0 1 1;1 1 0];
     numRots = [3 3 1 1 1]; 
 end
+
+% ---------small board--------------
+% Pieces={};
+% Pieces{1} = [0 1;1 1];
+% Pieces{2} = [1 1];
+% Pieces{3} = [1];
+% numRots = [3 1 0]; 
+% GameSize = [6,3]; % height x width
+% RowCap = 3; % height of gameOver
+% -----------------------------------
 
 % Set piece colors
 Pcolor=1:length(Pieces);
@@ -61,8 +71,14 @@ Pcolor=1:length(Pieces);
 if buildStates,
     display(datetime('now'))
     tic
-    [moves,flatBoards,boards,stateMap] = ...
-      tetrisBuild(RowCap,GameSize(2),Pieces,numRots);
+    if exist(cache_file,"file")
+        load(cache_file,"moves","flatBoards","boards","stateMap");
+        assert(length(moves)==length(Pieces) && size(stateMap,1)==2^(RowCap*GameSize(2))*length(Pieces));
+    else
+        [moves,flatBoards,boards,stateMap] = ...
+          tetrisBuild(RowCap,GameSize(2),Pieces,numRots);
+        save(cache_file,"moves","flatBoards","boards","stateMap","-v7.3");
+    end
     DATA.flatBoards = flatBoards;
     DATA.boards = boards;
     DATA.moves = moves;
@@ -72,7 +88,6 @@ else
     moves = tetrisBuild(RowCap,GameSize(2),Pieces,numRots);
     DATA.moves = moves;
 end
-
 % A few more parameters
 S_Sounds=0; % Switch, 1=sounds on, 0=sounds off
 S_Plot=1;  % Switch to Perform plotting, 1=yes
@@ -85,7 +100,6 @@ for kc=1:nEpisodes,
     
     CurPnum = startPiece;
     board=zeros(GameSize);
-
     if S_Plot==1
         figure(1)
     end
@@ -100,7 +114,7 @@ for kc=1:nEpisodes,
 
             % the game board that is under the red line
             boardLower = board(GameSize-RowCap+1:end,:); 
-            boardLower = boardLower>0;
+            boardLower = boardLower>0; % lizx: thresholding
             
             %%%%%%%%%%%%%%
             %%%%%%%%%%%%%%
@@ -111,7 +125,6 @@ for kc=1:nEpisodes,
             theString = strcat('[decision,DATA] =',myFun,...
                 '(boardLower,CurPnum,DATA);');
             eval(theString);
-
             cols = find(sum(decision,1)>0);
             rows = find(sum(decision,2)>0);
             CurPlace = cols(1);

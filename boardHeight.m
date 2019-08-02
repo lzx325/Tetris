@@ -1,5 +1,5 @@
 function h = boardHeight(board)
-
+% lizx: NOTE: This is for uncolored boar height
 %
 % Compute the height of each column
 %

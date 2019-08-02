@@ -10,7 +10,7 @@ function [newBoard,score] = nextBoard(board,move)
 top = boardHeight(board);
 bot = boardHeight(flip(move));
 tmp = find(bot == 0);
-bot(tmp) = -inf;
+bot(tmp) = -inf; % lizx: why set in -inf
 
 newTop = max(top+bot);
 
@@ -25,6 +25,7 @@ else
         board(tmp:tmp+size(move,1)-1,:) + move;
 end
 
+% rows cleared
 rows = find(sum(newBoard,2) == nc);
 score = length(rows);
 newBoard(rows,:) = [];

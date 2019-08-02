@@ -1,14 +1,9 @@
 function [decision,DATAout] = myPlay(board,pieceNum,DATA)
-% 
-% Places the piece to minimize the maximum height
-%
-for u = 1:length(DATA.moves{pieceNum}),
-    move = DATA.moves{pieceNum}{u};
-    theNextBoard = nextBoard(board,move); % lizx: What the next board will be
-    height(u) = max(boardHeight(theNextBoard));
+    addpath("./play_strategies");
+    %[decision,DATAout] = play_minMaxHeight(board,pieceNum,DATA);
+    %[decision,DATAout] = play_generalValueIteration(board,pieceNum,DATA);
+    %[decision,DATAout] = play_valueIteration(board,pieceNum,DATA);
+    [decision,DATAout] = play_randomChoice(board,pieceNum,DATA);
+
 end
 
-[~,uBest] = min(height);
-
-decision = DATA.moves{pieceNum}{uBest}; % lizx: allowed moves on this current piece, all translations and rotations
-DATAout = DATA;

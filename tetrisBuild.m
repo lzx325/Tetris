@@ -40,13 +40,21 @@ if nargout > 1,
     flatBoards = [];
     nBits = nc*nr;
     nCombos = 2^nBits;
+    flatBoards=zeros(nCombos,nBits);
+    boards=cell(1,nBits);
     for kc = 0:(nCombos-1),
+        if mod(kc,10000)==0
+            kc
+        end
         newRow = de2bi(kc,nBits);
-        flatBoards = [flatBoards;newRow];
+        flatBoards(kc+1,:)=newRow;
         boards{kc+1} = reshape(newRow,nr,nc);
     end
     
     stateMap = [];
+
+    % lizx: every board configuration and pending piece
+    
     for i = 1:nPieces,
         stateMap = [stateMap;[1:nCombos]' i*ones(nCombos,1)];
     end
