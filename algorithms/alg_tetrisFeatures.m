@@ -9,6 +9,6 @@ function [phi]=alg_tetrisFeatures(bd,pc,a,params)
     [bd_new,rw] = nextBoard(bd,mv);
     bd_new_height=boardHeight(bd_new);
     phi(2)=max(bd_new_height);
-    %phi(5)=min(bd_new_height);
-%     phi(4)=rw;
+    phi(3)=min(bd_new_height);
+    phi(4)=rw;
 end

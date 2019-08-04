@@ -27,7 +27,7 @@ function [decision,DATAout] = play_sarsaLinearFA(board,pieceNum,DATA)
         phi=alg_tetrisFeatures(board,pieceNum,a,DATA.params);
         state_action_features(a,:)=phi';
     end
-    action_valuations=(state_action_features*DATA.W)';
+    action_valuations=(state_action_features*DATA.W)'; % estimated value of each action
     A_distribution=alg_epsGreedyPolicy(1,action_valuations,DATA.params.eps);
     
     A=find(mnrnd(1,A_distribution,1));
@@ -41,6 +41,7 @@ function [decision,DATAout] = play_sarsaLinearFA(board,pieceNum,DATA)
         feature_prev=alg_tetrisFeatures(board_prev,pieceNum_prev,A_prev,DATA.params);
         q_prev=feature_prev'*DATA.W;
         delta_W=DATA.params.learning_rate*(R_prev+DATA.params.discount_factor*q_plus-q_prev)*feature_prev;
+%         fprintf("%.2e, %.2e, %.2e\n",R_prev,q_plus,q_prev);
         DATA.W=DATA.W+delta_W;
 %         if delta_W(4)>0
 %             keyboard;

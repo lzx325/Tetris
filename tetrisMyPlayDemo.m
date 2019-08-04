@@ -19,19 +19,19 @@ use_cache=true;
 cache_file="cache/tetrisBuildCache.mat";
 % A few more parameters
 S_Sounds=0; % Switch, 1=sounds on, 0=sounds off
-S_Plot=0;  % Switch to Perform plotting, 1=yes
+S_Plot=1;  % Switch to Perform plotting, 1=yes
 
 display_figure=false;
 N = 50; % max number of pieces per episode
-nEpisodes = 100; % number of episodes
+nEpisodes = 10; % number of episodes
 
-buildStates = 0; % flag to build state space
+buildStates = 1; % flag to build state space
 morePieces = 0; % add the s-shaped pieces
 
 GameSize = [8,6]; % height x width
 RowCap = 4; % height of gameOver
 
-TimeDelay=.0; % Time delay of dropping piece (lower number=faster)
+TimeDelay=.05; % Time delay of dropping piece (lower number=faster)
 
 %
 % DATA = structure structure to pass back and forth to myPlay
