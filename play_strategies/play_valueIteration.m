@@ -1,5 +1,6 @@
 function [decision,DATAout] = play_valueIteration(board,pieceNum,DATA)
     cache_file="cache/play_valueIteration_cache.mat";
+    use_cache=false;
     assert(all(isfield(DATA,["flatBoards","boards","moves","stateMap"])));
     addpath("./algorithms");
     if ~all(isfield(DATA,["J","mu","Q","params"]))
@@ -18,7 +19,7 @@ function [decision,DATAout] = play_valueIteration(board,pieceNum,DATA)
         params.TERMINAL_STATE=params.n_states;
         params.alpha=0.9;
         reload_flag=false;
-        if exist(cache_file,"file")
+        if exist(cache_file,"file") && use_cache
             load(cache_file,"J","mu","Q");
             if length(J)==params.n_states && length(mu)==params.n_states && isequal(size(Q),[params.n_states,params.max_n_actions])
                 reload_flag=true;

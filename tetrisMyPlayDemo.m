@@ -15,17 +15,23 @@ beep off
 % [decision,DATA] = myFun(boardLower,CurPnum,DATA)
 %
 myFun = 'myPlay';
+use_cache=true;
 cache_file="cache/tetrisBuildCache.mat";
-N = 50; % max number of pieces per episode
-nEpisodes = 1; % number of episodes
+% A few more parameters
+S_Sounds=0; % Switch, 1=sounds on, 0=sounds off
+S_Plot=0;  % Switch to Perform plotting, 1=yes
 
-buildStates = 1; % flag to build state space
+display_figure=false;
+N = 50; % max number of pieces per episode
+nEpisodes = 100; % number of episodes
+
+buildStates = 0; % flag to build state space
 morePieces = 0; % add the s-shaped pieces
 
-GameSize = [8,4]; % height x width
-RowCap = 3; % height of gameOver
+GameSize = [8,6]; % height x width
+RowCap = 4; % height of gameOver
 
-TimeDelay=.05; % Time delay of dropping piece (lower number=faster)
+TimeDelay=.0; % Time delay of dropping piece (lower number=faster)
 
 %
 % DATA = structure structure to pass back and forth to myPlay
@@ -42,6 +48,8 @@ DATA.example2 = [];
 % Initialize and Setup Game
 
 DATA.rowCap = RowCap;
+DATA.nEpisodes=nEpisodes;
+DATA.maxStages=N;
 numRots = [3 3 1]; %number of times each piece can be rotated, the total set of configurations is the rotations plus the original one
 % Define the game pieces
 Pieces{1} = [0 1;1 1];
@@ -54,13 +62,14 @@ if morePieces == 1,
 end
 
 % ---------small board--------------
-% Pieces={};
-% Pieces{1} = [0 1;1 1];
-% Pieces{2} = [1 1];
-% Pieces{3} = [1];
-% numRots = [3 1 0]; 
-% GameSize = [6,3]; % height x width
-% RowCap = 3; % height of gameOver
+Pieces={};
+Pieces{1} = [0 1;1 1];
+Pieces{2} = [1 1];
+Pieces{3} = [1];
+numRots = [3 1 0]; 
+GameSize = [6,3]; % height x width
+RowCap = 3; % height of gameOver
+use_cache=false;
 % -----------------------------------
 
 % Set piece colors
@@ -71,7 +80,7 @@ Pcolor=1:length(Pieces);
 if buildStates,
     display(datetime('now'))
     tic
-    if exist(cache_file,"file")
+    if use_cache && exist(cache_file,"file")
         load(cache_file,"moves","flatBoards","boards","stateMap");
         assert(length(moves)==length(Pieces) && size(stateMap,1)==2^(RowCap*GameSize(2))*length(Pieces));
     else
@@ -88,9 +97,6 @@ else
     moves = tetrisBuild(RowCap,GameSize(2),Pieces,numRots);
     DATA.moves = moves;
 end
-% A few more parameters
-S_Sounds=0; % Switch, 1=sounds on, 0=sounds off
-S_Plot=1;  % Switch to Perform plotting, 1=yes
 
 % Execute Game
 
@@ -207,9 +213,10 @@ for kc=1:nEpisodes,
                 if  S_Plot==1
                     title(['ROUND ', num2str(kc),...
                         ': Score=',num2str(Score),', Pieces=', num2str(numPlays)])
-                    disp(['ROUND ', num2str(kc),...
-                        ': Score=',num2str(Score),', Pieces=', num2str(numPlays)])
+                    
                 end
+                disp(['ROUND ', num2str(kc),...
+                        ': Score=',num2str(Score),', Pieces=', num2str(numPlays)])
                 if S_Sounds==1, load gong.mat; sound(y,1*Fs);  end
             end
         end
