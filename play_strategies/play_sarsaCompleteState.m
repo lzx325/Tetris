@@ -16,7 +16,7 @@ function [decision,DATAout] = play_sarsaCompleteState(board,pieceNum,DATA)
         params.max_n_actions=max(cellfun(@length,params.moves));
         params.TERMINAL_STATE=params.n_states;
         params.discount_factor=0.9;
-        params.learning_rate0=0.9;
+        params.learning_rate0=0.1;
         params.learning_rate=params.learning_rate0;
         params.eps0=1;
         params.eps=params.eps0;
@@ -55,7 +55,7 @@ function [decision,DATAout] = play_sarsaCompleteState(board,pieceNum,DATA)
         DATA=rmfield(DATA,"S_prev");
         DATA=rmfield(DATA,"A_prev");
         DATA=rmfield(DATA,"R_prev");
-        DATA.params.learning_rate=min(DATA.params.learning_rate0/DATA.episode,1);
+        DATA.params.learning_rate=min(DATA.params.learning_rate0,1);
         DATA.params.eps=min(DATA.params.eps0/DATA.episode,1);
         fprintf("game over, current step: %d, next episode: episode %d, eps: %.2e\n", DATA.step, DATA.episode, DATA.params.eps);
     else

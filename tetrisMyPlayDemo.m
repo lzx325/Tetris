@@ -19,19 +19,18 @@ use_cache=true;
 cache_file="cache/tetrisBuildCache.mat";
 % A few more parameters
 S_Sounds=0; % Switch, 1=sounds on, 0=sounds off
-S_Plot=1;  % Switch to Perform plotting, 1=yes
+S_Plot=0;  % Switch to Perform plotting, 1=yes
 
-display_figure=false;
 N = 50; % max number of pieces per episode
-nEpisodes = 10; % number of episodes
+nEpisodes = 500; % number of episodes
 
-buildStates = 1; % flag to build state space
+buildStates = 0; % flag to build state space
 morePieces = 0; % add the s-shaped pieces
 
 GameSize = [8,6]; % height x width
 RowCap = 4; % height of gameOver
 
-TimeDelay=.05; % Time delay of dropping piece (lower number=faster)
+TimeDelay=.0; % Time delay of dropping piece (lower number=faster)
 
 %
 % DATA = structure structure to pass back and forth to myPlay
@@ -217,6 +216,9 @@ for kc=1:nEpisodes,
                 end
                 disp(['ROUND ', num2str(kc),...
                         ': Score=',num2str(Score),', Pieces=', num2str(numPlays)])
+                % statistics
+                episode_reward(kc)=Score;
+                episode_length(kc)=numPlays;
                 if S_Sounds==1, load gong.mat; sound(y,1*Fs);  end
             end
         end
