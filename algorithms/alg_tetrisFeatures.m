@@ -6,7 +6,7 @@ function [phi]=alg_tetrisFeatures(bd,pc,a,params)
     mv=params.moves{pc}{a};
     [bd_new,n_rows_cleared] = nextBoard(bd,mv);
     rw=n_rows_cleared;
-    if ~isequal(size(bd_new),bd)
+    if ~isequal(size(bd_new),size(bd))
         rw=-1;
     end
     bd_new_height=boardHeight(bd_new);

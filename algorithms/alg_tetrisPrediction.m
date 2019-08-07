@@ -3,7 +3,7 @@ function [Q_pred,phi]=alg_tetrisPrediction(bd,pc,a,W,params)
     mv=params.moves{pc}{a};
     [bd_new,n_rows_cleared] = nextBoard(bd,mv);
     rw=n_rows_cleared;
-    if ~isequal(size(bd_new),size(bd))
+    if ~isequal(size(bd_new),size(bd)) && ~isnan(params.reward_game_over)
         rw=params.reward_game_over;
     end
     bd_new_height=boardHeight(bd_new);

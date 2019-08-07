@@ -22,7 +22,7 @@ S_Sounds=0; % Switch, 1=sounds on, 0=sounds off
 S_Plot=0;  % Switch to Perform plotting, 1=yes
 
 N = 50; % max number of pieces per episode
-nEpisodes = 500; % number of episodes
+nEpisodes = 50; % number of episodes
 
 buildStates = 0; % flag to build state space
 morePieces = 0; % add the s-shaped pieces
@@ -61,14 +61,14 @@ if morePieces == 1,
 end
 
 % ---------small board--------------
-Pieces={};
-Pieces{1} = [0 1;1 1];
-Pieces{2} = [1 1];
-Pieces{3} = [1];
-numRots = [3 1 0]; 
-GameSize = [6,3]; % height x width
-RowCap = 3; % height of gameOver
-use_cache=false;
+% Pieces={};
+% Pieces{1} = [0 1;1 1];
+% Pieces{2} = [1 1];
+% Pieces{3} = [1];
+% numRots = [3 1 0]; 
+% GameSize = [6,3]; % height x width
+% RowCap = 3; % height of gameOver
+% use_cache=false;
 % -----------------------------------
 
 % Set piece colors
@@ -116,7 +116,7 @@ for kc=1:nEpisodes,
         if GameOver ~= 1,
             
             CurPnum = randi(length(Pieces));
-
+            %CurPnum = 3;
             % the game board that is under the red line
             boardLower = board(GameSize-RowCap+1:end,:); 
             boardLower = boardLower>0; % lizx: thresholding
@@ -182,7 +182,6 @@ for kc=1:nEpisodes,
                 end
 
                 if S_Plot==1
-
                     [r,c] = size(GameBoard1);                           % Get the matrix size
                     imagesc((1:c)+0.5,(1:r)+0.5,GameBoard1,[0,max(Pcolor)]);            % Plot the image
                     axis equal                                   % Make axes grid sizes equal
@@ -195,6 +194,7 @@ for kc=1:nEpisodes,
                     title(['Score=',num2str(Score), ', N=', num2str(numPlays)])
                     hold off
                     pause(TimeDelay);
+                    
                 end
             end
 

@@ -15,6 +15,7 @@ function [decision,DATAout] = play_sarsaLinearFA(board,pieceNum,DATA)
         params.eps0=1;
         params.eps=params.eps0;
         params.n_features=5;
+        params.reward_game_over=-1;
         DATA.W=zeros(params.n_features,1);
         DATA.params=params;
         DATA.episode=1;
@@ -22,21 +23,23 @@ function [decision,DATAout] = play_sarsaLinearFA(board,pieceNum,DATA)
     end
     
     n_allowed_actions=length(DATA.moves{pieceNum});
-    state_action_features=zeros(n_allowed_actions,DATA.params.n_features);
+%     state_action_features=zeros(n_allowed_actions,DATA.params.n_features);
+    action_valuations=zeros(1,n_allowed_actions);
     for a=1:n_allowed_actions
-        phi=alg_tetrisFeatures(board,pieceNum,a,DATA.params);
-        state_action_features(a,:)=phi';
+%         phi=alg_tetrisFeatures(board,pieceNum,a,DATA.params);
+%         state_action_features(a,:)=phi';
+        [action_valuations(a),~]=alg_tetrisPrediction(board,pieceNum,a,DATA.W,DATA.params);
     end
-    action_valuations=(state_action_features*DATA.W)'; % estimated value of each action
+    %action_valuations=(state_action_features*DATA.W)'; % estimated value of each action
     A_distribution=alg_epsGreedyPolicy(1,action_valuations,DATA.params.eps);
-    
     A=find(mnrnd(1,A_distribution,1));
     decision=DATA.moves{pieceNum}{A};
     [newBoard,n_rows_cleared] = nextBoard(board,decision);
     R=n_rows_cleared;
-    if ~isequal(size(newBoard),board)
-        R=-1;
+    if ~isequal(size(newBoard),board) && ~isnan(DATA.params.reward_game_over)
+        R=DATA.params.reward_game_over;
     end
+
     % sarsa update
     %==============================================================================
     if DATA.step>1
@@ -45,11 +48,12 @@ function [decision,DATAout] = play_sarsaLinearFA(board,pieceNum,DATA)
         R_prev=DATA.R_prev;
         A_prev=DATA.A_prev;
         
-        
-        feature_current=alg_tetrisFeatures(board,pieceNum,A,DATA.params);
-        q_current=feature_current'*DATA.W;
-        feature_prev=alg_tetrisFeatures(board_prev,pieceNum_prev,A_prev,DATA.params);
-        q_prev=feature_prev'*DATA.W;
+        [q_current,~]=alg_tetrisPrediction(board,pieceNum,A,DATA.W,DATA.params);
+        [q_prev,feature_prev]=alg_tetrisPrediction(board_prev,pieceNum_prev,A_prev,DATA.W,DATA.params);
+%         feature_current=alg_tetrisFeatures(board,pieceNum,A,DATA.params);
+%         q_current=feature_current'*DATA.W;
+%         feature_prev=alg_tetrisFeatures(board_prev,pieceNum_prev,A_prev,DATA.params);
+%         q_prev=feature_prev'*DATA.W;
         delta_W=(R_prev+DATA.params.discount_factor*q_current-q_prev)*feature_prev;
         DATA.W=DATA.W+DATA.params.learning_rate*delta_W;   
 %         if ~ max(abs(delta_W))==0 && R_prev>0
@@ -103,10 +107,11 @@ function [decision,DATAout] = play_sarsaLinearFA(board,pieceNum,DATA)
     % game over, next episode
     if ~isequal(size(newBoard),size(board)) || DATA.step>=DATA.maxStages
         % terminal weight update
-        feature_current=alg_tetrisFeatures(board,pieceNum,A,DATA.params);
-        q_current=feature_current'*DATA.W;
+%         feature_current=alg_tetrisFeatures(board,pieceNum,A,DATA.params);
+%         q_current=feature_current'*DATA.W;
+        [q_current,feature_current]=alg_tetrisPrediction(board,pieceNum,A,DATA.W,DATA.params);
 
-        delta_W=(R_prev-q_current)*feature_prev;
+        delta_W=(R_prev-q_current)*feature_current;
         DATA.W=DATA.W+DATA.params.learning_rate*delta_W;   
         
         % prepare next episode
